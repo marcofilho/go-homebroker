@@ -118,9 +118,17 @@ func (b *Book) createTransaction(incomingOrder, matchedOrder *Order) *Transactio
 	return NewTransaction(sellOrder, buyOrder, shares, matchedOrder.Price)
 }
 
+func (b *Book) recordTransaction(transaction *Transaction) {
+	b.Transactions = append(b.Transactions, transaction)
+	transaction.BuyingOrder.Transactions = append(transaction.BuyingOrder.Transactions, transaction)
+	transaction.SellingOrder.Transactions = append(transaction.SellingOrder.Transactions, transaction)
+
+}
+
 func (b *Book) processTransaction(transaction *Transaction) {
 	defer b.Wg.Done()
 	transaction.Process()
+	b.recordTransaction(transaction)
 	b.ProcessedOrders <- transaction.BuyingOrder
 	b.ProcessedOrders <- transaction.SellingOrder
 }

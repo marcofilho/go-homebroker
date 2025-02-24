@@ -9,7 +9,7 @@ type Order struct {
 	Price         float64        `json:"price"`
 	OrderType     string         `json:"order_type"`
 	Status        string         `json:"status"`
-	Transaction   []*Transaction `json:"transaction"`
+	Transactions  []*Transaction `json:"transaction"`
 }
 
 func NewOrder(orderID string, investor *Investor, asset *Asset, shares int, price float64, orderType string) *Order {
@@ -22,7 +22,7 @@ func NewOrder(orderID string, investor *Investor, asset *Asset, shares int, pric
 		Price:         price,
 		OrderType:     orderType,
 		Status:        "OPEN",
-		Transaction:   []*Transaction{},
+		Transactions:  []*Transaction{},
 	}
 }
 
@@ -39,5 +39,5 @@ func (o *Order) ApplyTrade(tradedShares int) {
 }
 
 func (o *Order) AddTransaction(transaction *Transaction) {
-	o.Transaction = append(o.Transaction, transaction)
+	o.Transactions = append(o.Transactions, transaction)
 }
