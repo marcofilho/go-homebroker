@@ -3,14 +3,12 @@ package entity
 import "sync"
 
 type Book struct {
-	Orders          []*Order       `json:"orders"`
-	Transactions    []*Transaction `json:"transactions"`
+	Orders          []*Order
+	Transactions    []*Transaction
 	IncomingOrders  chan *Order
 	ProcessedOrders chan *Order
 	Wg              *sync.WaitGroup
 }
-
-type OrderQueue []*Order
 
 func NewBook(incomingOrders chan *Order, processedOrders chan *Order, wg *sync.WaitGroup) *Book {
 	return &Book{
@@ -22,34 +20,34 @@ func NewBook(incomingOrders chan *Order, processedOrders chan *Order, wg *sync.W
 	}
 }
 
-func (oq *OrderQueue) Add(order *Order) {
+type orderQueue []*Order
+
+func (oq *orderQueue) Add(order *Order) {
 	*oq = append(*oq, order)
 }
 
-func (oq *OrderQueue) GetNextOrder() *Order {
+func (oq *orderQueue) GetNextOrder() *Order {
 	if len(*oq) == 0 {
 		return nil
 	}
-
 	order := (*oq)[0]
 	*oq = (*oq)[1:]
-
 	return order
 }
 
 func (b *Book) Trade() {
-	buyOrders := make(map[string]*OrderQueue)
-	sellOrders := make(map[string]*OrderQueue)
+	buyOrders := make(map[string]*orderQueue)
+	sellOrders := make(map[string]*orderQueue)
 
 	for order := range b.IncomingOrders {
 		asset := order.Asset.ID
 
 		if buyOrders[asset] == nil {
-			buyOrders[asset] = &OrderQueue{}
+			buyOrders[asset] = &orderQueue{}
 		}
 
 		if sellOrders[asset] == nil {
-			sellOrders[asset] = &OrderQueue{}
+			sellOrders[asset] = &orderQueue{}
 		}
 
 		if order.OrderType == "BUY" {
@@ -60,12 +58,11 @@ func (b *Book) Trade() {
 	}
 }
 
-func (b *Book) tryMatch(newOrder *Order, availableOrders, pendingOrders *OrderQueue) {
+func (b *Book) tryMatch(newOrder *Order, availableOrders, pendingOrders *orderQueue) {
 	for {
 		potentialMatch := availableOrders.GetNextOrder()
-
 		if potentialMatch == nil {
-			break
+			break // Não há mais ordens disponíveis para matching
 		}
 
 		if !b.pricesMatch(newOrder, potentialMatch) {
@@ -77,7 +74,7 @@ func (b *Book) tryMatch(newOrder *Order, availableOrders, pendingOrders *OrderQu
 			matchedTransaction := b.createTransaction(newOrder, potentialMatch)
 			b.processTransaction(matchedTransaction)
 
-			if potentialMatch.PendingShares == 0 {
+			if potentialMatch.PendingShares > 0 {
 				availableOrders.Add(potentialMatch)
 			}
 
@@ -96,7 +93,6 @@ func (b *Book) pricesMatch(order, matchOrder *Order) bool {
 	if order.OrderType == "BUY" {
 		return matchOrder.Price <= order.Price
 	}
-
 	return matchOrder.Price >= order.Price
 }
 
@@ -110,7 +106,6 @@ func (b *Book) createTransaction(incomingOrder, matchedOrder *Order) *Transactio
 	}
 
 	shares := incomingOrder.PendingShares
-
 	if matchedOrder.PendingShares < shares {
 		shares = matchedOrder.PendingShares
 	}
@@ -122,7 +117,6 @@ func (b *Book) recordTransaction(transaction *Transaction) {
 	b.Transactions = append(b.Transactions, transaction)
 	transaction.BuyingOrder.Transactions = append(transaction.BuyingOrder.Transactions, transaction)
 	transaction.SellingOrder.Transactions = append(transaction.SellingOrder.Transactions, transaction)
-
 }
 
 func (b *Book) processTransaction(transaction *Transaction) {

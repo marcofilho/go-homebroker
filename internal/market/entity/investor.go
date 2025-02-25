@@ -1,14 +1,9 @@
 package entity
 
 type Investor struct {
-	ID            string                   `json:"id"`
-	Name          string                   `json:"name"`
-	AssetPosition []*InvestorAssetPosition `json:"assetPosition"`
-}
-
-type InvestorAssetPosition struct {
-	AssetID string `json:"asset_id"`
-	Shares  int    `json:"shares"`
+	ID            string
+	Name          string
+	AssetPosition []*InvestorAssetPosition
 }
 
 func NewInvestor(id string) *Investor {
@@ -40,6 +35,11 @@ func (i *Investor) GetAssetPosition(assetID string) *InvestorAssetPosition {
 	return nil
 }
 
+type InvestorAssetPosition struct {
+	AssetID string
+	Shares  int
+}
+
 func NewInvestorAssetPosition(assetID string, shares int) *InvestorAssetPosition {
 	return &InvestorAssetPosition{
 		AssetID: assetID,
@@ -47,6 +47,6 @@ func NewInvestorAssetPosition(assetID string, shares int) *InvestorAssetPosition
 	}
 }
 
-func (iap *InvestorAssetPosition) AddShares(quantity int) {
-	iap.Shares += quantity
+func (iap *InvestorAssetPosition) AddShares(qtd int) {
+	iap.Shares += qtd
 }

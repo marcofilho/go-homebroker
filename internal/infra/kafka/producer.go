@@ -15,7 +15,7 @@ func NewKafkaProducer(configMap *kafka.ConfigMap) *Producer {
 func (p *Producer) Publish(msg interface{}, key []byte, topic string) error {
 	producer, err := kafka.NewProducer(p.ConfigMap)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	message := &kafka.Message{
@@ -29,7 +29,7 @@ func (p *Producer) Publish(msg interface{}, key []byte, topic string) error {
 
 	err = producer.Produce(message, nil)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	return nil

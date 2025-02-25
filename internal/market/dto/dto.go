@@ -10,10 +10,6 @@ type TradeInput struct {
 	OrderType     string  `json:"order_type"`
 }
 
-func (t TradeInput) Unmarshal(value []byte) {
-	panic("unimplemented")
-}
-
 type OrderOutput struct {
 	OrderID            string               `json:"order_id"`
 	InvestorID         string               `json:"investor_id"`

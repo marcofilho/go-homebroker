@@ -61,7 +61,6 @@ func main() {
 			panic(err)
 		}
 
-		// Imprime e publica o resultado no Kafka
 		fmt.Println(string(jsonOutput))
 		producer.Publish(jsonOutput, []byte("processed_orders"), "processed_orders")
 	}

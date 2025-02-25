@@ -1,9 +1,9 @@
 package entity
 
 type Asset struct {
-	ID           string `json:"id"`
-	Name         string `json:"name"`
-	MarketVolume int    `json:"market_volume"`
+	ID           string
+	Name         string
+	MarketVolume int
 }
 
 func NewAsset(id, name string, marketVolume int) *Asset {

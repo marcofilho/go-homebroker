@@ -1,15 +1,15 @@
 package entity
 
 type Order struct {
-	ID            string         `json:"id"`
-	Investor      *Investor      `json:"investor"`
-	Asset         *Asset         `json:"asset"`
-	Shares        int            `json:"shares"`
-	PendingShares int            `json:"pending_shares"`
-	Price         float64        `json:"price"`
-	OrderType     string         `json:"order_type"`
-	Status        string         `json:"status"`
-	Transactions  []*Transaction `json:"transaction"`
+	ID            string
+	Investor      *Investor
+	Asset         *Asset
+	Shares        int
+	PendingShares int
+	Price         float64
+	OrderType     string
+	Status        string
+	Transactions  []*Transaction
 }
 
 func NewOrder(orderID string, investor *Investor, asset *Asset, shares int, price float64, orderType string) *Order {
@@ -38,6 +38,6 @@ func (o *Order) ApplyTrade(tradedShares int) {
 	}
 }
 
-func (o *Order) AddTransaction(transaction *Transaction) {
-	o.Transactions = append(o.Transactions, transaction)
+func (o *Order) AddTransaction(t *Transaction) {
+	o.Transactions = append(o.Transactions, t)
 }
